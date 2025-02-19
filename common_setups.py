@@ -1,6 +1,11 @@
-import copy, munch, numbers, collections.abc
+import collections.abc
+import copy
+import numbers
+
+import munch
 
 import lib.scalar_schedule as sSchedule
+
 
 #https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth
 def _CSETUPS_update_dict_recursive(d, u, deepcopy=False, new_key='KEEP'):
@@ -58,10 +63,10 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 		'sample_gradients':True,
 		'boundary': None,
 		'SDF_threshold': 0.02,
-		
+
 		'steps_per_cycle':24,
 		'num_images': 24,
-		
+
 		'main_camera':{
 			'base_resolution':[256,1920,1080], #z(depth), y(height), x(width)
 			'resolution_scale':1./3., # only for xy
@@ -76,15 +81,15 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 			'crop_frustum':False, # crop frustum grid to AABB of vidual hull. for performance
 			'crop_frustum_pad':2, # view space cells
 		},
-		
+
 		'allow_static_cameras':False,
 		'allow_fused_rendering':True,
-		
+
 		'background':{
 			'type':'COLOR', #'CAM', 'COLOR', 'NONE'; only for vis-rendering, not used in optimization
 			'color': [0,0.5,1.0], #[0,0.5,0],
 		},
-		
+
 		'lighting':{
 			#'scattering_ratio':1.,
 			'ambient_intensity':0.64,
@@ -108,7 +113,7 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 		'clip_grid_pad':6,
 		'crop_grid':True,
 		'hull':'TARGETS', #ALL, TARGETS, ROT, [<ids>, ], empty==ALL
-		
+
 		'simulation':0,
 		'start':140,
 		'stop':142, #exclusive
@@ -179,7 +184,7 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 			'gamma_real':[0.5,2], #range for random gamma correction on real samples (value here is inverse gamma)
 			'gamma_fake':[0.5,2], #range for random gamma correction on fake samples (value here is inverse gamma)
 		#	'gamma_loss':[0.5,2], #range for random gamma correction applied to input when evaluating the disc as loss (for density) (value here is inverse gamma)
-			
+
 		},
 		'load_sequence':None, #only for rendering without optimization
 		'load_sequence_pre_opt':False,
@@ -196,35 +201,35 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 		'start_iteration': 0,
 		'frame_order':'FWD', #FWD, BWD, RAND
 		'sequence_length': sSchedule.setup_constant_schedule(start=-1), #shedule for sequence length. cast to int, -1 to use full length
-		
-		
+
+
 		'resource_device':'/cpu:0', #'/cpu:0', '/gpu:0'
-		
+
 		#'loss':'L2',
 		'train_res_down':6,
 		'loss_active_eps':1e-18, #minimum absolute value of a loss scale for the loss to be considered active (to prevent losses scaled to (almost) 0 from being evaluated)
-		
+
 		'randomization':{
 			'transform':False,
 			'sequence_length':False,
 			'grid_size_relative': 1.0, # minimum relative grid size, 1 to diable grid size randomizaton
 			'grid_size_min': 3, # minimum absolute grid size
-			
+
 			'grow_mode': None, # None, "RAND", "ITERATE", "RANDINTERVAL"
-			
+
 			# range of random intensity scale for images (inputs and targets)
 			'scale_images_min':1,
 			'scale_images_max':1,
 			# range of random density scale for velocity training
 			'scale_density_min':1,
 			'scale_density_max':1,
-			
+
 			'inputs':True,
 			'input_weights':None, #relative weights for targets, none for uniform
 			'min_inputs':1,
 			'max_inputs':5,
 			'num_inputs_weights':None, #relative weights for number of targets, none for uniform
-			
+
 			'targets':False,
 			'target_weights':None, #relative weights for targets, none for uniform
 			'min_targets':1,
@@ -258,7 +263,7 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 				'first':{ #settings for first frame
 					'iterations':0,#30000,
 					'learning_rate':sSchedule.setup_exponential_schedule(start=3.0, base=0.5, scale=2/30000), #{'type':'exponential', 'start':3.0, 'base':0.5, 'scale':2/30000},
-					
+
 					'raw_target_loss':8.7e-7 *20,
 					'preprocessed_target_loss':0.,
 					'volume_target_loss':0.,
@@ -279,7 +284,7 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 				'iterations':2400,#5000,
 				'seq_init':"WARP", #WARP, COPY, BASE
 				'learning_rate':sSchedule.setup_exponential_schedule(start=3.0, base=0.5, scale=1/3000), #{'type':'exponential', 'start':0.00005, 'base':0.5, 'scale':2/30000},
-				
+
 				'raw_target_loss':8.7e-7 *20,
 				'preprocessed_target_loss':0.,
 				'volume_target_loss':0.,
@@ -295,23 +300,23 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 				'center_loss':0.0,
 				'SDF_pos_loss':0.0,
 				'regularization':0.0001,
-				
+
 				'inspect_gradients':1,
 				'grow':{
 					"factor":1.2,#2. factor per interval, max down-scaling is factor^len(intervals)
 					'intervals':[],
 				},
 			},
-			
+
 			'grow_lifting_skip': None,
 			'grow_lifting_train': None,
 			'grow_lifting_lr': None,
-			
+
 			'grow_lifting_residual': None,
 			'grow_volenc_residual': None,
-			
+
 			'learning_rate':sSchedule.setup_exponential_schedule(start=2.45, base=0.5, scale=2/30000),#0.00015, #[0.00001,0.00001,0.0001, 0.00009/20000, 4000],
-			
+
 			'raw_target_loss':8.7e-7 *20,#for AE; for SE *40; for Huber *80
 			'preprocessed_target_loss':0.,
 			'volume_target_loss':0.,
@@ -319,18 +324,18 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 			'target_depth_smoothness_loss':0.,
 			'hull':0.,#1e-12,
 			'negative':0.,#1e-12,
-			
-			'smoothness_loss':0.0, 
+
+			'smoothness_loss':0.0,
 			'smoothness_neighbours':3, # the kind of neighbourhood to consider in the edge filter (e.g. wether to use diagonals), NOT the kernel size.
 			'smoothness_loss_2':0.0,
 			'temporal_smoothness_loss':0.0,#0.2
-			
+
 			'discriminator_loss':1.5e-5,
 			'warp_loss':[6.7e-11 *4,6.7e-11 *4,13.4e-11 *4, 6.7e-11 *4/2000, 2000],#for AE; for SE *8, for Huber *24
 			'center_loss':0.0,
 			'SDF_pos_loss':0.0,#for AE; for SE *8, for Huber *24
 			'regularization':0.0001,
-			
+
 			'main_warp_fwd':False,
 			'warp_gradients':{
 				'weight':sSchedule.setup_constant_schedule(start=1.0),
@@ -341,8 +346,8 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 			"view_interpolation":{
 				"steps":0,
 			},
-			
-			'grow':{ 
+
+			'grow':{
 				"factor":1.2,#2. factor per interval, max down-scaling is factor^len(intervals)
 				"pre_grow_actions":[],# "WARP", list, unused
 				"post_grow_actions":[],# "WARP", list
@@ -370,7 +375,7 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 				'first':{ #settings for first frame
 					'iterations':0,
 					'learning_rate':0.04,
-					
+
 					'volume_target_loss':0.,
 					'density_warp_loss':8.2e-11 *5,
 					'density_proxy_warp_loss':0,
@@ -391,13 +396,13 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 						"scale_magnitude":True,
 						'intervals':[200, 260, 330, 400, 460, 530, 600, 660, 800, 930, 1060, 1260], #7490
 					},
-				
+
 				},
 				#settings for remaining frames
 				'iterations':1200,
 				'seq_init':"WARP", #WARP, COPY, BASE
 				'learning_rate':0.02,
-				
+
 				'volume_target_loss':0.,
 				'density_warp_loss':8.2e-11 *5,
 				'density_proxy_warp_loss':0,
@@ -412,19 +417,19 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 				'CFL_loss':0.0,
 				'MS_coherence_loss':0.0,
 				'regularization':0.0001,
-				
+
 				'grow':{
 					"factor":1.2,#2. factor per interval, max down-scaling is factor^len(intervals)
 					"scale_magnitude":True,
 					'intervals':[],
 				},
 			},
-			
+
 			'noise_std':sSchedule.setup_constant_schedule(start=0.0),
 			'learning_rate':sSchedule.setup_exponential_schedule(start=0.02, base=0.5, scale=2/30000),#{'type':'exponential', 'max':0.02, 'start':0.02, 'base':0.5, 'scale':2/30000, 'offset':0},
-					
+
 		#	'lr_decay':0.00,
-			
+
 		#	'loss':'L2',
 			'volume_target_loss':0.,
 			'density_warp_loss':8.2e-11 *5,#for AE; for SE *10; for Huber *25 #influence of loss(A(dt, vt), dt+1) on velocity, can be a schedule
@@ -434,28 +439,28 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 			'density_target_warp_loss_MS_weighting':sSchedule.setup_constant_schedule(start=1.0),
 			'velocity_warp_loss':sSchedule.setup_linear_schedule_2(start=1.35e-11 *3, end=1.35e-11 *6, steps=5000), #2.7e-12 *5,#for AE; for SE *10; for Huber *20 #influence of loss(A(vt, vt), vt+1) on velocity, can be a schedule
 			# 'velocity_warp_loss_MS_weighting':sSchedule.setup_constant_schedule(start=1.0),
-			
+
 			'smoothness_loss':0.0,
 			'smoothness_neighbours':3, # the kind of neighbourhood to consider in the edge filter (e.g. wether to use diagonals), NOT the kernel size.
 			'cossim_loss':0.0,
-			
+
 			'divergence_loss':sSchedule.setup_exponential_schedule(start=4.3e-10 *6, base=1.2, scale=1/500),
 			'divergence_loss_MS_weighting':sSchedule.setup_constant_schedule(start=1.0),
 			'divergence_normalize':0.0,
-			
+
 			'magnitude_loss':0.0,#1e-12,
 			'CFL_loss':0.0,
 			'CFL_loss_MS_weighting':sSchedule.setup_constant_schedule(start=1.0),
 			'MS_coherence_loss':0.0,
 			'MS_coherence_loss_MS_weighting':sSchedule.setup_constant_schedule(start=1.0),
 			'regularization':0.0001,
-			
+
 			'warp_gradients':{
 				'weight':sSchedule.setup_constant_schedule(start=1.0), #affects warp gradients for velocity from backward dens warp, even if vel- warp gradients are inactive
 				'active':False,
 				'decay':sSchedule.setup_constant_schedule(start=0.9), #[0,1], lower is faster decay
 			},
-			
+
 			'grow':{
 				"factor":1.2,#2. factor per interval, max down-scaling is factor^len(intervals)
 				"scale_magnitude":True,
@@ -464,7 +469,7 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 		},
 		"MS_weighting": sSchedule.setup_constant_schedule(start=1.0), #level-relative loss weighting for multi-scale losses. here the "iteration" is the level index, which starts with 0 at the COARSEST resolution.
 		"allow_MS_losses": True,
-		
+
 		'optimize_buoyancy':False,
 		"light":{
 			"optimize":False,
@@ -480,13 +485,13 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 	#		"max":1.0,
 	#		"learning_rate":{'type':'exponential', 'start':0.001, 'base':1, 'scale':0},
 	#	},
-		
-		
+
+
 		'discriminator':{
 			'active':False,
 			'model':None,#'[RUNID:200227-162722]disc_model.h5',#
 			'loss_type':"RaLSGAN", #"SGAN", "RpSGAN", "RpLSGAN", "RaSGAN", "RaLSGAN"
-			'target_label':1.0,#0.9, #0.9 for label smoothing, 1.0 for LS-GAN 
+			'target_label':1.0,#0.9, #0.9 for label smoothing, 1.0 for LS-GAN
 			# l4s
 			'layers':[16,16,24,24,32,32,32,64,64,64,16, 4],
 			'stride':[ 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 1],
@@ -514,13 +519,13 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 			'steps':1,
 			'regularization':0.002,
 			'optim_beta':0.5,
-			
+
 			'grow':{ # not yet used
 				"factor":2.,#2. factor per interval, max down-scaling is factor^len(intervals)
 				#iterations for each grow step, empty to disable
 				'intervals':[]
 			},
-			
+
 			'conditional_hull':False,
 			'temporal_input':{
 				'active':False,
@@ -540,7 +545,7 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 				'reset_on_density_grow':True,
 			#	'reset_on_discriminator_grow':False,
 			},
-			
+
 		#	'sequence_reuse':True,
 		},#discriminator
 		'summary_interval':100,
@@ -583,7 +588,7 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 				# },
 				# 'iterations':400,
 			# },
-			# 'grow':{ 
+			# 'grow':{
 				# "factor":1.2,
 				# "pre_grow_actions":[],
 				# "post_grow_actions":[],
@@ -651,7 +656,7 @@ RECONSTRUCT_SEQUENCE_SETUP_BASE = {
 				# },
 				# 'iterations':600,
 			# },
-			# 'grow':{ 
+			# 'grow':{
 				# "factor":1.2,
 				# "pre_grow_actions":[],
 				# "post_grow_actions":[],
@@ -705,7 +710,7 @@ GROWINGUNET_CONFIG = {
 	#"dimension": 2,
 	#"num_levels": 3,
 	"level_scale_factor": 2,
-	
+
 	#"input_channels": 3,
 	"input_levels": 1,
 	"create_inputs": True,
@@ -713,25 +718,25 @@ GROWINGUNET_CONFIG = {
 	#"input_conv_filters": 1,
 	#"input_conv_kernel_size": 1,
 	"share_input_layer": False,
-	
+
 	"down_mode": "STRIDED", # STRIDED, NONE
 	"down_conv_filters": None,
 	"down_conv_kernel_size": 4,
 	"share_down_layer": True,
-	
+
 	"encoder_resblocks": ["RB:1-1_1-1"],
 	"share_encoder": False,
-	
+
 	"decoder_resblocks": ["RB:1-1_1-1"],
 	"share_decoder": False,
-	
+
 	"up_mode": "NNSAMPLE_CONV",
 	"up_conv_filters": 1,
 	"up_conv_kernel_size": 4,
 	"share_up_layer": True,
-	
+
 	"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-	
+
 	#"output_levels": 1,
 	"output_blocks": None,
 	#"output_channels": 1,
@@ -755,17 +760,17 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 		'clip_grid_pad':4,
 		'crop_grid':True,
 		'res_down_factor':128*5, #target data down scale factor is 6 (i.e. 1/6 of raw image resolution) at 128 base grid resolution
-		
+
 		'start':20,#56,#40,
 		'stop':141,#68,#52, #exclusive
 		'step':2,#2,
-		# 
+		#
 		"randomize":64,
 		"batch_size":4,
 		"sims":list(range(20)),
 		"sequence_step":1,
 		"sequence_length":1,
-		
+
 		"density":{
 			'target_type': "PREPROC", #RAW, PREPROC, SYNTHETIC
 			'scale':1,
@@ -794,36 +799,36 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 			#"load_lifting":None, #lifting could be NN
 			"merge":"MEAN", # SUM, MEAN ;method to merge 3D embeddings of multiple views
 			#"load_merge":None, #merging could be NN
-			
+
 			"model":{
 				"num_levels": "VARIABLE",
 				"level_scale_factor": 2,
-				
+
 				"input_levels": 1,
 				"create_inputs": True,
 				"input_blocks": ["C:1-1"],
 				#"input_conv_filters": 1,
 				#"input_conv_kernel_size": 1,
 				"share_input_layer": False,
-				
+
 				"down_mode": "STRIDED", # STRIDED, NONE
 				"down_conv_filters": None,
 				"down_conv_kernel_size": 4,
 				"share_down_layer": True,
-				
+
 				"encoder_resblocks": ["RB:1-1_1-1"],
 				"share_encoder": False,
-				
+
 				"decoder_resblocks": ["RB:1-1_1-1"],
 				"share_decoder": False,
-				
+
 				"up_mode": "NNSAMPLE_CONV",
 				"up_conv_filters": 1,
 				"up_conv_kernel_size": 4,
 				"share_up_layer": True,
-				
+
 				"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-				
+
 				#"output_levels": 1,
 				"output_blocks": None,
 				"output_channels": 1,
@@ -850,32 +855,32 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 			"model":{
 				"num_levels": "VARIABLE",
 				"level_scale_factor": 2,
-				
+
 				"input_levels": 1,
 				"create_inputs": True,
 				"input_blocks": ["C:1-1"],
 				#"input_conv_filters": 1,
 				#"input_conv_kernel_size": 1,
 				"share_input_layer": False,
-				
+
 				"down_mode": "STRIDED", # STRIDED, NONE
 				"down_conv_filters": None,
 				"down_conv_kernel_size": 4,
 				"share_down_layer": True,
-				
+
 				"encoder_resblocks": ["RB:1-1_1-1"],
 				"share_encoder": False,
-				
+
 				"decoder_resblocks": ["RB:1-1_1-1"],
 				"share_decoder": False,
-				
+
 				"up_mode": "NNSAMPLE_CONV",
 				"up_conv_filters": 1,
 				"up_conv_kernel_size": 4,
 				"share_up_layer": True,
-				
+
 				"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-				
+
 				#"output_levels": 1,
 				"output_blocks": None,
 				"output_channels": 1,
@@ -902,32 +907,32 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 			"model":{
 				"num_levels": "VARIABLE",
 				"level_scale_factor": 2,
-				
+
 				"input_levels": 1,
 				"create_inputs": True,
 				"input_blocks": ["C:1-1"],
 				#"input_conv_filters": 1,
 				#"input_conv_kernel_size": 1,
 				"share_input_layer": False,
-				
+
 				"down_mode": "STRIDED", # STRIDED, NONE
 				"down_conv_filters": None,
 				"down_conv_kernel_size": 4,
 				"share_down_layer": True,
-				
+
 				"encoder_resblocks": ["RB:1-1_1-1"],
 				"share_encoder": False,
-				
+
 				"decoder_resblocks": ["RB:1-1_1-1"],
 				"share_decoder": False,
-				
+
 				"up_mode": "NNSAMPLE_CONV",
 				"up_conv_filters": 1,
 				"up_conv_kernel_size": 4,
 				"share_up_layer": True,
-				
+
 				"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-				
+
 				#"output_levels": 1,
 				"output_blocks": None,
 				"output_channels": 1,
@@ -954,32 +959,32 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 			"model":{
 				"num_levels": "VARIABLE",
 				"level_scale_factor": 2,
-				
+
 				"input_levels": 1,
 				"create_inputs": True,
 				"input_blocks": ["C:1-1"],
 				#"input_conv_filters": 1,
 				#"input_conv_kernel_size": 1,
 				"share_input_layer": False,
-				
+
 				"down_mode": "STRIDED", # STRIDED, NONE
 				"down_conv_filters": None,
 				"down_conv_kernel_size": 4,
 				"share_down_layer": True,
-				
+
 				"encoder_resblocks": ["RB:1-1_1-1"],
 				"share_encoder": False,
-				
+
 				"decoder_resblocks": ["RB:1-1_1-1"],
 				"share_decoder": False,
-				
+
 				"up_mode": "NNSAMPLE_CONV",
 				"up_conv_filters": 1,
 				"up_conv_kernel_size": 4,
 				"share_up_layer": True,
-				
+
 				"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-				
+
 				#"output_levels": 1,
 				"output_blocks": None,
 				"share_output_layer": True,
@@ -1017,7 +1022,7 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 					#"dimension": 2,
 					"num_levels": "VARIABLE",
 					"level_scale_factor": 2,
-					
+
 					#"input_channels": 3,
 					"input_levels": 1,
 					"create_inputs": True,
@@ -1025,25 +1030,25 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 					#"input_conv_filters": 1,
 					#"input_conv_kernel_size": 1,
 					"share_input_layer": False,
-					
+
 					"down_mode": "STRIDED", # STRIDED, NONE
 					"down_conv_filters": None,
 					"down_conv_kernel_size": 4,
 					"share_down_layer": True,
-					
+
 					"encoder_resblocks": ["RB:1-1_1-1"],
 					"share_encoder": False,
-					
+
 					"decoder_resblocks": ["RB:1-1_1-1"],
 					"share_decoder": False,
-					
+
 					"up_mode": "NNSAMPLE_CONV",
 					"up_conv_filters": 1,
 					"up_conv_kernel_size": 4,
 					"share_up_layer": True,
-					
+
 					"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-					
+
 					#"output_levels": 1,
 					"output_blocks": None,
 					#"output_channels": 1,
@@ -1057,7 +1062,7 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 					"conv_padding": "ZERO", # ZERO, MIRRIR
 					"normalization": "LAYER", # NONE, LAYER
 				}, # or path to model file
-				
+
 				"start_level": 0,
 				"min_grid_res": 10,
 				"train_mode": "ALL", #"ALL", "TOP", "TOP_DEC"
@@ -1069,7 +1074,7 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 				"step_input_features": [0,1],
 				"type_input_features": ["TARGET_UNPROJECTION"], # case-sensitive, order-invariant. TARGET_UNPROJECTION, TARGET_HULL
 				"warp_input_indices": [0], #indices of network inputs to be warped. first the the density inputs, then the elements of step_input_features
-				
+
 				"recursive_MS": False, #do recursion and growing in NeuralGrid instead of UNet/Model. evey level uses the full specified model, potetially with multiple levels.
 				"recursive_MS_levels": "VARIABLE",
 				"recursive_MS_residual": True,
@@ -1080,7 +1085,7 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 				"skip_merge_weight_schedule": sSchedule.setup_linear_schedule_2(start=1., end=1.0, steps=650, offset=250),
 				"grow_intervals": [],
 				"recursive_MS_copy_on_grow": True,
-				
+
 				"base_SDF_mode": "NONE", # "NONE", "RESIDUAL", "INPUT_RESIDUAL"
 			},
 			'pre_optimization': True,
@@ -1116,7 +1121,7 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 					#"dimension": 2,
 					"num_levels": "VARIABLE",
 					"level_scale_factor": 2,
-					
+
 					#"input_channels": 3,
 					"input_levels": 1,
 					"create_inputs": True,
@@ -1124,25 +1129,25 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 					#"input_conv_filters": 1,
 					#"input_conv_kernel_size": 1,
 					"share_input_layer": False,
-					
+
 					"down_mode": "STRIDED", # STRIDED, NONE
 					"down_conv_filters": None,
 					"down_conv_kernel_size": 4,
 					"share_down_layer": True,
-					
+
 					"encoder_resblocks": ["RB:1-1_1-1"],
 					"share_encoder": False,
-					
+
 					"decoder_resblocks": ["RB:1-1_1-1"],
 					"share_decoder": False,
-					
+
 					"up_mode": "NNSAMPLE_CONV",
 					"up_conv_filters": 1,
 					"up_conv_kernel_size": 4,
 					"share_up_layer": True,
-					
+
 					"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-					
+
 					#"output_levels": 1,
 					"output_blocks": None,
 					#"output_channels": 1,
@@ -1168,17 +1173,17 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_DENSITY = {
 				"type_input_features": ["TARGET_UNPROJECTION"], # case-sensitive, order-invariant. TARGET_UNPROJECTION, TARGET_HULL
 				"downscale_input_modes": ["RESAMPLE", "RESAMPLE"], #
 				"warp_input_indices": [0], #indices of network inputs to be warped. first the the density inputs, then the elements of step_input_features
-				
+
 				"share_downscale_encoder": False,
-				
+
 				"recursive_MS": False, #do recursion and growing in NeuralGrid instead of UNet/Model. evey level uses the full specified model, potetially with multiple levels.
 				"recursive_MS_levels": "VARIABLE",
 				"recursive_MS_direct_input": False, #if false: generate density decoder input at highest scale/resolution and sample down. if true: generate input at resolution required for current scale.
-				"recursive_MS_use_max_level_input": False, 
+				"recursive_MS_use_max_level_input": False,
 				"recursive_MS_scale_factor": 2,
 				"recursive_MS_shared_model": True,
 				"recursive_MS_train_mode": "ALL", #ALL, TOP
-				"recursive_MS_residual_weight": None, 
+				"recursive_MS_residual_weight": None,
 				"skip_merge_weight_schedule": sSchedule.setup_linear_schedule_2(start=1., end=1.0, steps=650, offset=250),
 				"grow_intervals": [],
 				"recursive_MS_copy_on_grow": True,
@@ -1218,11 +1223,11 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_VELOCITY = {
 		'clip_grid_pad':4,
 		'crop_grid':True,
 		'res_down_factor':128*5, #target data down scale factor is 6 (i.e. 1/6 of raw image resolution) at 128 base grid resolution
-		
+
 		'start':20,#56,#40,
 		'stop':141,#68,#52, #exclusive
 		'step':2,#2,
-		# 
+		#
 		"randomize":64,
 		"batch_size":4,
 		"sims":list(range(20)),
@@ -1256,36 +1261,36 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_VELOCITY = {
 			#"load_lifting":None, #lifting could be NN
 			"merge":"MEAN", # SUM, MEAN ;method to merge 3D embeddings of multiple views
 			#"load_merge":None, #merging could be NN
-			
+
 			"model":{
 				"num_levels": "VARIABLE",
 				"level_scale_factor": 2,
-				
+
 				"input_levels": 1,
 				"create_inputs": True,
 				"input_blocks": ["C:1-1"],
 				#"input_conv_filters": 1,
 				#"input_conv_kernel_size": 1,
 				"share_input_layer": False,
-				
+
 				"down_mode": "STRIDED", # STRIDED, NONE
 				"down_conv_filters": None,
 				"down_conv_kernel_size": 4,
 				"share_down_layer": True,
-				
+
 				"encoder_resblocks": ["RB:1-1_1-1"],
 				"share_encoder": False,
-				
+
 				"decoder_resblocks": ["RB:1-1_1-1"],
 				"share_decoder": False,
-				
+
 				"up_mode": "NNSAMPLE_CONV",
 				"up_conv_filters": 1,
 				"up_conv_kernel_size": 4,
 				"share_up_layer": True,
-				
+
 				"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-				
+
 				#"output_levels": 1,
 				"output_blocks": None,
 				"output_channels": 1,
@@ -1311,32 +1316,32 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_VELOCITY = {
 			"model":{
 				"num_levels": "VARIABLE",
 				"level_scale_factor": 2,
-				
+
 				"input_levels": 1,
 				"create_inputs": True,
 				"input_blocks": ["C:1-1"],
 				#"input_conv_filters": 1,
 				#"input_conv_kernel_size": 1,
 				"share_input_layer": False,
-				
+
 				"down_mode": "STRIDED", # STRIDED, NONE
 				"down_conv_filters": None,
 				"down_conv_kernel_size": 4,
 				"share_down_layer": True,
-				
+
 				"encoder_resblocks": ["RB:1-1_1-1"],
 				"share_encoder": False,
-				
+
 				"decoder_resblocks": ["RB:1-1_1-1"],
 				"share_decoder": False,
-				
+
 				"up_mode": "NNSAMPLE_CONV",
 				"up_conv_filters": 1,
 				"up_conv_kernel_size": 4,
 				"share_up_layer": True,
-				
+
 				"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-				
+
 				#"output_levels": 1,
 				"output_blocks": None,
 				"output_channels": 1,
@@ -1357,32 +1362,32 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_VELOCITY = {
 			"model":{
 				"num_levels": "VARIABLE",
 				"level_scale_factor": 2,
-				
+
 				"input_levels": 1,
 				"create_inputs": True,
 				"input_blocks": ["C:1-1"],
 				#"input_conv_filters": 1,
 				#"input_conv_kernel_size": 1,
 				"share_input_layer": False,
-				
+
 				"down_mode": "STRIDED", # STRIDED, NONE
 				"down_conv_filters": None,
 				"down_conv_kernel_size": 4,
 				"share_down_layer": True,
-				
+
 				"encoder_resblocks": ["RB:1-1_1-1"],
 				"share_encoder": False,
-				
+
 				"decoder_resblocks": ["RB:1-1_1-1"],
 				"share_decoder": False,
-				
+
 				"up_mode": "NNSAMPLE_CONV",
 				"up_conv_filters": 1,
 				"up_conv_kernel_size": 4,
 				"share_up_layer": True,
-				
+
 				"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-				
+
 				#"output_levels": 1,
 				"output_blocks": None,
 				"output_channels": 1,
@@ -1409,32 +1414,32 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_VELOCITY = {
 			"model":{
 				"num_levels": "VARIABLE",
 				"level_scale_factor": 2,
-				
+
 				"input_levels": 1,
 				"create_inputs": True,
 				"input_blocks": ["C:1-1"],
 				#"input_conv_filters": 1,
 				#"input_conv_kernel_size": 1,
 				"share_input_layer": False,
-				
+
 				"down_mode": "STRIDED", # STRIDED, NONE
 				"down_conv_filters": None,
 				"down_conv_kernel_size": 4,
 				"share_down_layer": True,
-				
+
 				"encoder_resblocks": ["RB:1-1_1-1"],
 				"share_encoder": False,
-				
+
 				"decoder_resblocks": ["RB:1-1_1-1"],
 				"share_decoder": False,
-				
+
 				"up_mode": "NNSAMPLE_CONV",
 				"up_conv_filters": 1,
 				"up_conv_kernel_size": 4,
 				"share_up_layer": True,
-				
+
 				"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-				
+
 				#"output_levels": 1,
 				"output_blocks": None,
 				"share_output_layer": True,
@@ -1474,7 +1479,7 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_VELOCITY = {
 					#"dimension": 2,
 					"num_levels": "VARIABLE",
 					"level_scale_factor": 2,
-					
+
 					#"input_channels": 3,
 					"input_levels": -1,
 					"create_inputs": True,
@@ -1482,25 +1487,25 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_VELOCITY = {
 					#"input_conv_filters": 1,
 					#"input_conv_kernel_size": 1,
 					"share_input_layer": True,
-					
+
 					"down_mode": "NONE", # STRIDED, NONE
 					"down_conv_filters": None,
 					"down_conv_kernel_size": 4,
 					"share_down_layer": True,
-					
+
 					"encoder_resblocks": ["RB:8_16_s0","RB:8_16_s0","RB:8_16_s0","RB:8_16_s0"],
 					"share_encoder": True,
-					
+
 					"decoder_resblocks": ["RB:8_16","RB:8_16_s0","RB:8_16_s0","RB:8_16_s0"],
 					"share_decoder": True,
-					
+
 					"up_mode": "NNSAMPLE_CONV",
 					"up_conv_filters": 16,
 					"up_conv_kernel_size": 4,
 					"share_up_layer": True,
-					
+
 					"skip_merge_mode": "CONCAT", # CONCAT, WSUM, SUM
-					
+
 					#"output_levels": 1,
 					"output_blocks": ["RB:8_16_s0","RB:8_16_s0","RB:8_16_s0","RB:8_16_s0","RB:8_16_s0"],
 					#"output_channels": 1,
@@ -1525,17 +1530,17 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_VELOCITY = {
 				"type_input_features": ["TARGET_UNPROJECTION"],
 				"downscale_input_modes": ["RESAMPLE", "RESAMPLE"], #
 				"warp_input_indices": [0], #indices of network inputs to be warped. first the the density inputs, then the elements of step_input_features
-				
-				
-				
+
+
+
 				"recursive_MS": False, #do recursion and growing in NeuralGrid instead of UNet/Model. evey level uses the full specified model, potetially with multiple levels.
 				"recursive_MS_levels": "VARIABLE",
 				"recursive_MS_direct_input": False, #if false: generate density decoder input at highest scale/resolution and sample down. if true: generate input at resolution required for current scale.
-				"recursive_MS_use_max_level_input": False, 
+				"recursive_MS_use_max_level_input": False,
 				"recursive_MS_scale_factor": 2,
 				"recursive_MS_shared_model": True,
 				"recursive_MS_train_mode": "ALL", #ALL, TOP
-				"recursive_MS_residual_weight": None, 
+				"recursive_MS_residual_weight": None,
 				"grow_intervals": [1200,1400,1600,1800],
 				"recursive_MS_copy_on_grow": True,
 				"train_mode": "ALL", #"ALL", "TOP", "TOP_DEC"
@@ -1546,8 +1551,8 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_VELOCITY = {
 				'first':{ #settings for first frame
 					'iterations':16000,#10000, #30000,
 					'learning_rate':{'type':'exponential', 'max':1e-5, 'start':1e-5, 'base':0.5, 'scale':1/2000, 'offset':0},
-					
-					'density_warp_loss':1, 
+
+					'density_warp_loss':1,
 					'velocity_warp_loss':0.0,
 					'smoothness_loss':0.0,
 					'smoothness_neighbours':3,
@@ -1562,7 +1567,7 @@ RECONSTRUCT_SEQUENCE_SETUP_NEURAL_VELOCITY = {
 						"scale_magnitude":False,
 						'intervals':[1200,1400,1600,1800], #6000
 					},
-				
+
 				},
 			},
 		},
@@ -1605,7 +1610,7 @@ def reconstruct_sequence_setup_compatibility(setup, log_func=lambda s, *p: None)
 		setup.data.density.target_type = "SYNTHETIC" if setup.data.density.synthetic_target else "RAW"
 		log_key_update('setup.data.density.synthetic_target', setup.data.density.synthetic_target, 'setup.data.density.target_type', setup.data.density.target_type)
 		del setup.data.density.synthetic_target
-	
+
 	# adjustments for mechanical changes
 	#	if using data from before the sampling step correction: multiply density with 256, warn about loss and shadow/light scaling
 
